@@ -3,9 +3,12 @@
 > **The trust layer every AI agent calls before it touches money.**
 > Risk-scoring ASP for the OKX.AI marketplace. Pay-per-call via x402.
 
-[![OKX.AI Hackathon](https://img.shields.io/badge/OKX.AI-Genesis%20Hackathon-2026-7b2ff7)](https://web3.okx.com/xlayer/build-x-series)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Node 20+](https://img.shields.io/badge/node-20%2B-brightgreen)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org)
 [![MCP](https://img.shields.io/badge/MCP-compatible-00d4ff)](https://modelcontextprotocol.org)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![x402](https://img.shields.io/badge/payment-x402%2FAPP-7b2ff7)](https://web3.okx.com/whitepaper/okx-app-whitepaper.pdf)
+[![Live](https://img.shields.io/badge/live-sentriagent.xyz-success)](https://sentriagent.xyz)
 
 Built for the **OKX AI Genesis Hackathon** (Jul 3-17, 2026) — the launch campaign seeding the first wave of Agent Service Providers (ASPs) for OKX's agent economy marketplace.
 
