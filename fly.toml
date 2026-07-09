@@ -1,0 +1,52 @@
+# Fly.io config for SentriAgent
+# Region: Singapore (sg) — closest to OKX X Layer ops, low latency for Asian + global agents
+app = "sentriagent"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "8080"
+  MCP_STDIO = "false"
+  PRICE_PER_CALL = "0.01"
+  PRICE_PER_BUNDLE = "0.05"
+  PAYMENT_NETWORK = "xlayer"
+  PAYMENT_TOKEN = "USDT"
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+    force_https = true
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 250
+    soft_limit = 200
+
+  [[services.http_checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/health"
+
+[deploy]
+  release_command = "node -e \"console.log('SentriAgent deployed')\""
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512

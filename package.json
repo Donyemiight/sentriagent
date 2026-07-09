@@ -1,0 +1,50 @@
+{
+  "name": "sentriagent",
+  "version": "0.1.0",
+  "description": "SentriAgent — The trust layer every AI agent calls before it touches money. Pay-per-call MCP service on OKX.AI.",
+  "type": "module",
+  "main": "dist/server.js",
+  "bin": {
+    "sentriagent": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "test": "node --test --experimental-strip-types test/*.test.ts",
+    "lint": "eslint . --ext .ts",
+    "deploy": "flyctl deploy --remote-only"
+  },
+  "keywords": [
+    "okx",
+    "okx-ai",
+    "agent-service-provider",
+    "asp",
+    "mcp",
+    "x402",
+    "agent-payments-protocol",
+    "risk-scoring",
+    "crypto-security",
+    "agent-economy"
+  ],
+  "author": "Olaniyan Oluyemi (@donyemiight)",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "fastify": "^5.1.0",
+    "zod": "^3.23.8",
+    "undici": "^7.0.0",
+    "pino": "^9.5.0",
+    "pino-pretty": "^13.0.0",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "eslint": "^9.17.0"
+  }
+}
