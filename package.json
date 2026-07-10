@@ -1,7 +1,7 @@
 {
   "name": "sentriagent",
   "version": "0.1.0",
-  "description": "SentriAgent — The trust layer every AI agent calls before it touches money. Pay-per-call MCP service on OKX.AI.",
+  "description": "SentriAgent \u2014 The trust layer every AI agent calls before it touches money. Pay-per-call MCP service on OKX.AI.",
   "type": "module",
   "main": "dist/server.js",
   "bin": {
