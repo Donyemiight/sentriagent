@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: sentriagent
+    runtime: node
+    plan: free
+    region: singapore
+    branch: main
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8080
+      - key: MCP_STDIO
+        value: "false"
+      - key: PRICE_PER_CALL
+        value: "0.01"
+      - key: PRICE_PER_BUNDLE
+        value: "0.05"
+      - key: PAYMENT_RECEIVER_ADDRESS
+        sync: false  # Will be set manually as secret
+      - key: PAYMENT_NETWORK
+        value: xlayer
+      - key: PAYMENT_TOKEN
+        value: USDT
