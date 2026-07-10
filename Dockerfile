@@ -1,17 +1,17 @@
 FROM node:20-alpine
 WORKDIR /app
 
-# Copy prebuilt dist (committed to git)
+# Install wget for healthcheck (not in alpine by default)
+RUN apk add --no-cache wget
+
+# Copy prebuilt dist (committed to git) + package files
 COPY package.json package-lock.json ./
 COPY dist ./dist
 
-# Install production deps only (no build needed)
+# Install production deps only
 RUN npm install --omit=dev --no-audit --no-fund --omit=optional
 
 EXPOSE 8080
 USER node
-
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 CMD ["node", "dist/server.js"]
