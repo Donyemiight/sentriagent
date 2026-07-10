@@ -1,21 +1,16 @@
 FROM node:20-alpine
 WORKDIR /app
 
-# Copy everything
-COPY package*.json ./
-COPY tsconfig.json ./
-COPY src ./src
+# Copy prebuilt dist (committed to git)
+COPY package.json package-lock.json ./
+COPY dist ./dist
 
-# Install + build + prune
-RUN npm install --no-audit --no-fund --omit=optional && \
-    npm run build && \
-    npm prune --omit=dev && \
-    mkdir -p public
+# Install production deps only (no build needed)
+RUN npm install --omit=dev --no-audit --no-fund --omit=optional
 
 EXPOSE 8080
 USER node
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
