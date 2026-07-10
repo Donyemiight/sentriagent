@@ -1,1 +1,1 @@
-{"version":3,"file":"config.d.ts","sourceRoot":"","sources":["../../src/utils/config.ts"],"names":[],"mappings":"AAAA;;GAEG;AA0CH,eAAO,MAAM,MAAM;;;;;;;;;;;;;;;aAAgB,CAAC"}
+{"version":3,"file":"config.d.ts","sourceRoot":"","sources":["../../src/utils/config.ts"],"names":[],"mappings":"AAAA;;GAEG;AA0CH,eAAO,MAAM,MAAM,KAAgB,CAAC"}

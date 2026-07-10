@@ -16,7 +16,7 @@ const ConfigSchema = z.object({
   pricePerBundle: z.coerce.number().positive().default(0.05),
 
   // Payment config
-  paymentReceiverAddress: z.string().default('0x0000000000000000000000000000000000000000'),
+  paymentReceiverAddress: z.string().default('0x843374d1be145494fc95ca483ae8e6bfbf94536c'),
   paymentNetwork: z.enum(['xlayer', 'base', 'polygon']).default('xlayer'),
   paymentToken: z.enum(['USDT', 'USDG', 'USDC']).default('USDT'),
 

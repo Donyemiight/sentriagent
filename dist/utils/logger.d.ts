@@ -1,6 +1,5 @@
 /**
  * Pino logger — JSON in prod, pretty in dev.
  */
-import pino from 'pino';
-export declare const logger: pino.Logger<never, boolean>;
+export declare const logger: any;
 //# sourceMappingURL=logger.d.ts.map
