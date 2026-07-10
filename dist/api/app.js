@@ -188,32 +188,81 @@ const landingPageHtml = `<!DOCTYPE html>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+      background: #0a0e27;
       color: #e0e6ff;
       min-height: 100vh;
       line-height: 1.6;
+      overflow-x: hidden;
     }
-    .container { max-width: 1200px; margin: 0 auto; padding: 60px 20px; }
-    header { text-align: center; margin-bottom: 80px; }
-    .logo { width: 100px; height: 100px; margin: 0 auto 30px; }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse at top left, rgba(0,212,255,0.15), transparent 50%),
+        radial-gradient(ellipse at bottom right, rgba(123,47,247,0.15), transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 60px 20px; position: relative; z-index: 1; }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 60px;
+      padding: 16px 0;
+    }
+    nav .logo-small { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; }
+    nav .logo-small img { width: 32px; height: 32px; }
+    nav .links { display: flex; gap: 24px; align-items: center; }
+    nav .links a { color: #a0a8c0; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    nav .links a:hover { color: #00d4ff; }
+    nav .links .btn-sm {
+      background: linear-gradient(135deg, #00d4ff 0%, #7b2ff7 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    header { text-align: center; margin-bottom: 60px; }
+    .logo { width: 96px; height: 96px; margin: 0 auto 24px; filter: drop-shadow(0 8px 32px rgba(0,212,255,0.3)); }
+    .launch-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(123,47,247,0.15));
+      border: 1px solid rgba(0,212,255,0.3);
+      color: #00d4ff;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .launch-badge::before { content: ''; width: 8px; height: 8px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 8px #00ff88; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
     h1 {
-      font-size: 4rem;
+      font-size: 4.5rem;
       font-weight: 800;
       background: linear-gradient(135deg, #00d4ff 0%, #7b2ff7 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       margin-bottom: 16px;
+      letter-spacing: -2px;
+      line-height: 1.1;
     }
-    .tagline { font-size: 1.5rem; color: #a0a8c0; margin-bottom: 30px; }
-    .badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+    .tagline { font-size: 1.4rem; color: #a0a8c0; margin-bottom: 32px; max-width: 700px; margin-left: auto; margin-right: auto; }
+    .badges { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
     .badge {
       background: rgba(0, 212, 255, 0.1);
       border: 1px solid rgba(0, 212, 255, 0.3);
       color: #00d4ff;
       padding: 6px 14px;
       border-radius: 20px;
-      font-size: 0.875rem;
+      font-size: 0.8rem;
       font-weight: 500;
     }
     .hero-cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
@@ -222,110 +271,237 @@ const landingPageHtml = `<!DOCTYPE html>
       border-radius: 8px;
       font-weight: 600;
       text-decoration: none;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       transition: transform 0.2s, box-shadow 0.2s;
       cursor: pointer;
       border: none;
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
     .btn-primary {
       background: linear-gradient(135deg, #00d4ff 0%, #7b2ff7 100%);
       color: white;
+      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.25);
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4); }
     .btn-secondary {
       background: transparent;
       color: #00d4ff;
-      border: 2px solid #00d4ff;
+      border: 1.5px solid rgba(0, 212, 255, 0.4);
     }
     .btn-secondary:hover { background: rgba(0, 212, 255, 0.1); }
 
+    /* Demo section */
+    .demo-section {
+      max-width: 900px;
+      margin: 60px auto;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 16px;
+      padding: 32px;
+      backdrop-filter: blur(10px);
+    }
+    .demo-section h2 { text-align: center; margin-bottom: 8px; font-size: 1.5rem; }
+    .demo-section .subtitle { text-align: center; color: #a0a8c0; margin-bottom: 24px; font-size: 0.9rem; }
+    .demo-form { display: flex; gap: 12px; flex-wrap: wrap; }
+    .demo-form input, .demo-form select {
+      flex: 1;
+      min-width: 200px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(0,212,255,0.2);
+      color: #e0e6ff;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: 'Courier New', monospace;
+    }
+    .demo-form input:focus, .demo-form select:focus { outline: none; border-color: #00d4ff; }
+    .demo-form button {
+      background: linear-gradient(135deg, #00d4ff 0%, #7b2ff7 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .demo-output {
+      margin-top: 20px;
+      padding: 20px;
+      background: #000;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: #00ff88;
+      min-height: 80px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      display: none;
+    }
+    .demo-output.active { display: block; }
+    .demo-output.error { color: #ff6b6b; }
+
     .section { margin-bottom: 80px; }
     .section h2 {
-      font-size: 2.5rem;
-      margin-bottom: 40px;
+      font-size: 2.2rem;
+      margin-bottom: 12px;
       text-align: center;
       color: #ffffff;
     }
-
-    .tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .section .section-sub {
+      text-align: center;
+      color: #a0a8c0;
+      margin-bottom: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
     .tool {
       background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 12px;
-      padding: 30px;
-      transition: transform 0.2s, border-color 0.2s;
+      padding: 24px;
+      transition: all 0.3s;
     }
-    .tool:hover { transform: translateY(-4px); border-color: rgba(0, 212, 255, 0.4); }
+    .tool:hover { transform: translateY(-4px); border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 8px 24px rgba(0,212,255,0.1); }
     .tool-name {
       font-family: 'Courier New', monospace;
       color: #00d4ff;
-      font-size: 1.125rem;
-      margin-bottom: 12px;
+      font-size: 1rem;
+      margin-bottom: 8px;
       font-weight: 600;
     }
-    .tool-desc { color: #a0a8c0; margin-bottom: 16px; }
+    .tool-desc { color: #a0a8c0; margin-bottom: 12px; font-size: 0.9rem; }
     .tool-price {
       color: #7b2ff7;
       font-weight: 600;
-      font-size: 0.875rem;
+      font-size: 0.85rem;
+    }
+
+    .chains { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 700px; margin: 0 auto; }
+    .chain {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: #e0e6ff;
+      font-weight: 500;
+    }
+    .chain.highlight {
+      background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(123,47,247,0.2));
+      border-color: rgba(0,212,255,0.5);
+      color: #00d4ff;
+      font-weight: 600;
     }
 
     .example {
-      background: #000000;
+      background: #000;
       border: 1px solid rgba(0, 212, 255, 0.3);
       border-radius: 12px;
-      padding: 30px;
-      margin: 40px 0;
+      padding: 24px;
+      margin: 40px auto;
+      max-width: 900px;
       overflow-x: auto;
     }
     .example pre {
       color: #00ff88;
       font-family: 'Courier New', monospace;
-      font-size: 0.875rem;
-      line-height: 1.8;
+      font-size: 0.85rem;
+      line-height: 1.7;
     }
     .example .comment { color: #666; }
     .example .string { color: #ffd700; }
     .example .keyword { color: #00d4ff; }
 
-    .pricing { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; max-width: 900px; margin: 0 auto; }
+    .pricing { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; max-width: 800px; margin: 0 auto; }
     .price-card {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
-      padding: 30px;
+      padding: 24px;
       text-align: center;
+      transition: all 0.3s;
     }
+    .price-card:hover { border-color: rgba(0,212,255,0.4); transform: translateY(-2px); }
     .price-amount {
-      font-size: 2.5rem;
+      font-size: 2.2rem;
       font-weight: 800;
-      color: #00d4ff;
-      margin-bottom: 8px;
+      background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
     }
-    .price-label { color: #a0a8c0; font-size: 0.875rem; }
+    .price-label { color: #a0a8c0; font-size: 0.85rem; }
 
-    footer { text-align: center; padding: 40px 20px; color: #666; font-size: 0.875rem; border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: 80px; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 24px;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px 0;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { color: #a0a8c0; font-size: 0.8rem; }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 60px;
+    }
     footer a { color: #00d4ff; text-decoration: none; }
 
     @media (max-width: 768px) {
-      h1 { font-size: 2.5rem; }
-      .tagline { font-size: 1.125rem; }
-      .section h2 { font-size: 1.75rem; }
+      h1 { font-size: 2.8rem; letter-spacing: -1px; }
+      .tagline { font-size: 1.1rem; }
+      .section h2 { font-size: 1.6rem; }
+      nav .links { display: none; }
+      .demo-form input, .demo-form select { min-width: 100%; }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <nav>
+      <div class="logo-small">
+        <img src="/logo.svg" alt="SentriAgent">
+        <span>SentriAgent</span>
+      </div>
+      <div class="links">
+        <a href="/docs">Docs</a>
+        <a href="/v1/info">API</a>
+        <a href="https://github.com/Donyemiight/sentriagent" target="_blank">GitHub</a>
+        <a href="https://x.com/donyemiight" target="_blank" class="btn-sm">Follow</a>
+      </div>
+    </nav>
+
     <header>
+      <div class="launch-badge">OKX.AI Genesis Hackathon 2026</div>
       <img src="/logo.svg" alt="SentriAgent" class="logo">
       <h1>SentriAgent</h1>
       <p class="tagline">The trust layer every AI agent calls before it touches money.</p>
       <div class="badges">
         <span class="badge">OKX.AI Agent Service Provider</span>
         <span class="badge">MCP Compatible</span>
-        <span class="badge">x402 Pay-per-Call</span>
+        <span class="badge">x402 / APP Pay-per-Call</span>
         <span class="badge">7 Chains</span>
+        <span class="badge">Multi-Source Risk Fusion</span>
       </div>
       <div class="hero-cta">
         <a href="/docs" class="btn btn-primary">Read the Docs</a>
@@ -333,22 +509,61 @@ const landingPageHtml = `<!DOCTYPE html>
       </div>
     </header>
 
+    <section class="stats">
+      <div class="stat">
+        <div class="stat-num">&lt;2s</div>
+        <div class="stat-label">Avg Response</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Signal Sources</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">7</div>
+        <div class="stat-label">Chains Supported</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0-100</div>
+        <div class="stat-label">Risk Score</div>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Try It Right Now</h2>
+      <p class="subtitle">See the x402 payment challenge live. Hit it with any token address.</p>
+      <form class="demo-form" id="demoForm">
+        <select id="demoChain">
+          <option value="ethereum">Ethereum</option>
+          <option value="bsc">BSC</option>
+          <option value="polygon">Polygon</option>
+          <option value="base">Base</option>
+          <option value="arbitrum">Arbitrum</option>
+          <option value="xlayer" selected>X Layer</option>
+          <option value="solana">Solana</option>
+        </select>
+        <input type="text" id="demoAddress" placeholder="0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" value="0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48">
+        <button type="submit">Send Request</button>
+      </form>
+      <pre class="demo-output" id="demoOutput"></pre>
+    </section>
+
     <section class="section">
       <h2>4 Tools. One Mission: Keep Agents Safe.</h2>
+      <p class="section-sub">Each tool is purpose-built for agents to call before risky transactions. Sub-cent pricing, sub-second latency.</p>
       <div class="tools">
         <div class="tool">
           <div class="tool-name">assess_token</div>
-          <div class="tool-desc">0-100 risk score for any token contract. Fuses OKX onchainos, GoPlus, and De.Fi signals.</div>
+          <div class="tool-desc">0-100 risk score for any token contract. Fuses OKX, GoPlus, and De.Fi signals.</div>
           <div class="tool-price">$0.01 USDT / call</div>
         </div>
         <div class="tool">
           <div class="tool-name">assess_wallet</div>
-          <div class="tool-desc">Risk profile for any wallet. Checks rug history, sanctions, mixer exposure, age.</div>
+          <div class="tool-desc">Risk profile for any wallet. Rug history, sanctions, mixer exposure, age.</div>
           <div class="tool-price">$0.01 USDT / call</div>
         </div>
         <div class="tool">
           <div class="tool-name">assess_tx</div>
-          <div class="tool-desc">Pre-flight transaction simulation. Combines target + sender risk before broadcast.</div>
+          <div class="tool-desc">Pre-flight tx simulation. Combines target + sender risk before broadcast.</div>
           <div class="tool-price">$0.02 USDT / call</div>
         </div>
         <div class="tool">
@@ -360,23 +575,38 @@ const landingPageHtml = `<!DOCTYPE html>
     </section>
 
     <section class="section">
-      <h2>Use It From Your Favorite Agent</h2>
+      <h2>Use It From Any Agent</h2>
+      <p class="section-sub">Drop into Claude Code, OpenClaw, Codex, or any MCP-compatible agent. Three lines of code.</p>
       <div class="example">
         <pre><span class="comment"># In Claude Code, OpenClaw, Codex, or any MCP client</span>
 <span class="keyword">await</span> mcp.call(<span class="string">"assess_token"</span>, {
   chain: <span class="string">"ethereum"</span>,
-  address: <span class="string">"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"</span>  <span class="comment">// USDC</span>
+  address: <span class="string">"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"</span>
 });
 
-<span class="comment">// Returns:</span>
+<span class="comment">// Returns 402 challenge → agent signs x402 payment → retry → verdict:</span>
 {
   score: <span class="string">96</span>,
   level: <span class="string">"SAFE"</span>,
   proceed: <span class="keyword">true</span>,
   recommendation: <span class="string">"PROCEED: Established asset with strong signals."</span>,
-  signals: { okx: {...}, goplus: {...}, defi: {...} },
+  sources: [<span class="string">"OKX onchainos-mcp"</span>, <span class="string">"GoPlus Security"</span>, <span class="string">"De.Fi"</span>],
   latencyMs: <span class="string">847</span>
 }</pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>7 Chains. Native Speed.</h2>
+      <p class="section-sub">Settlement on X Layer (gas-free stablecoins). Coverage where agents actually transact.</p>
+      <div class="chains">
+        <span class="chain">Ethereum</span>
+        <span class="chain">BSC</span>
+        <span class="chain">Polygon</span>
+        <span class="chain">Arbitrum</span>
+        <span class="chain">Base</span>
+        <span class="chain highlight">X Layer ★</span>
+        <span class="chain">Solana</span>
       </div>
     </section>
 
@@ -396,16 +626,52 @@ const landingPageHtml = `<!DOCTYPE html>
           <div class="price-label">per bundle (5 tokens)</div>
         </div>
       </div>
-      <p style="text-align: center; margin-top: 30px; color: #a0a8c0;">
-        Settled in USDT via OKX Agent Payments Protocol. Agents pay autonomously — no human in the loop.
+      <p style="text-align: center; margin-top: 24px; color: #a0a8c0; font-size: 0.9rem;">
+        Settled in USDT via OKX Agent Payments Protocol (APP). Agents pay autonomously — no human in the loop.
       </p>
     </section>
 
     <footer>
-      <p>Built for the <a href="https://web3.okx.com/xlayer/build-x-series">OKX AI Genesis Hackathon</a> by <a href="https://x.com/donyemiight">@donyemiight</a></p>
-      <p style="margin-top: 12px;">MIT licensed · <a href="https://github.com/Donyemiight/sentriagent">github.com/Donyemiight/sentriagent</a></p>
+      <p>Built for the <a href="https://web3.okx.com/xlayer/build-x-series" target="_blank">OKX AI Genesis Hackathon</a> by <a href="https://x.com/donyemiight" target="_blank">@donyemiight</a></p>
+      <p style="margin-top: 8px;">MIT licensed · <a href="https://github.com/Donyemiight/sentriagent" target="_blank">github.com/Donyemiight/sentriagent</a></p>
     </footer>
   </div>
+  <script>
+    const form = document.getElementById('demoForm');
+    const output = document.getElementById('demoOutput');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const chain = document.getElementById('demoChain').value;
+      const address = document.getElementById('demoAddress').value.trim();
+      output.classList.add('active');
+      output.classList.remove('error');
+      output.textContent = 'Sending request...';
+      try {
+        const res = await fetch('/v1/assess-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chain, address })
+        });
+        const data = await res.json();
+        if (res.status === 402) {
+          output.textContent = 'HTTP ' + res.status + ' Payment Required\\n\\n' +
+            'Challenge:\\n' +
+            '  price: ' + data.challenge.price + ' ' + data.challenge.currency + '\\n' +
+            '  network: ' + data.challenge.network + '\\n' +
+            '  receiver: ' + data.challenge.receiver + '\\n' +
+            '  paymentId: ' + data.challenge.paymentId + '\\n' +
+            '  intent: ' + data.challenge.intent + '\\n\\n' +
+            '→ Agent would sign x402 payment and retry with X-Payment header\\n' +
+            '→ Server verifies settlement, returns full risk verdict';
+        } else {
+          output.textContent = 'HTTP ' + res.status + '\\n\\n' + JSON.stringify(data, null, 2);
+        }
+      } catch (err) {
+        output.classList.add('error');
+        output.textContent = 'Error: ' + err.message;
+      }
+    });
+  </script>
 </body>
 </html>`;
 const docsPageHtml = `<!DOCTYPE html>
