@@ -17,7 +17,7 @@
 | **Author Handle** | @donyemiight |
 | **Author Email** | yemiight777@yahoo.com |
 | **Project Repo** | https://github.com/Donyemiight/sentriagent |
-| **Live URL** | https://sentriagent.xyz |
+| **Live URL** | https://sentriagent.xyz (primary) · https://sentriagent.onrender.com (alias) |
 | **Payment Receiver** | `0x843374d1be145494fc95ca483ae8e6bfbf94536c` (X Layer) |
 | **MCP Endpoint** | `stdio://sentriagent` (after install) |
 | **HTTP API** | https://sentriagent.xyz/v1/* |
