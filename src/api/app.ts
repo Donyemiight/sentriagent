@@ -5,12 +5,17 @@
  *   GET  /                    — Landing page
  *   GET  /health              — Health check
  *   GET  /v1/info             — Service info (for OKX marketplace listing)
+ *   POST /mcp                 — MCP-over-HTTP (stateless, for OKX.AI marketplace)
  *   POST /v1/assess-token     — Risk score for token ($0.01/call)
  *   POST /v1/assess-wallet    — Risk profile for wallet ($0.01/call)
  *   POST /v1/assess-tx        — Pre-flight tx simulation ($0.02/call)
  *   POST /v1/bundle-assess    — 5 tokens in one call ($0.05/call)
  *   POST /v1/payment/verify   — Verify x402 payment
  *   GET  /docs                — OpenAPI-style docs
+ *
+ * Note: /mcp is the A2MCP transport for the OKX.AI marketplace listing.
+ * It is stateless and free of charge — payment for tool calls is handled
+ * by the marketplace's own x402 layer, not by us.
  */
 
 import Fastify, { FastifyInstance } from 'fastify';
@@ -18,6 +23,7 @@ import { config } from '../utils/config.js';
 import { logger } from '../utils/logger.js';
 import { assessToken, assessWallet, assessTx, bundleAssess } from '../risk/engine.js';
 import { requirePayment } from '../payments/x402.js';
+import { handleMcpHttpRequest } from '../mcp/server.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({
@@ -67,6 +73,42 @@ export async function buildApp(): Promise<FastifyInstance> {
       landing: 'https://sentriagent.xyz/',
     },
   }));
+
+  // ─── MCP over HTTP (stateless) — for OKX.AI marketplace ──
+  // Accepts standard JSON-RPC 2.0 MCP messages:
+  //   initialize  → protocol handshake
+  //   tools/list  → enumerate our 4 tools
+  //   tools/call  → invoke a tool (returns same JSON verdict as stdio)
+  //
+  // Payment is NOT enforced here. The OKX.AI A2MCP marketplace
+  // wraps this endpoint in its own x402 layer; the standalone reviewer
+  // (initialize / tools/list) needs free access to verify the listing.
+  app.post('/mcp', async (req, reply) => {
+    const body = req.body as unknown;
+    if (!body || typeof body !== 'object') {
+      return reply.code(400).send({
+        jsonrpc: '2.0',
+        id: null,
+        error: { code: -32700, message: 'Parse error: expected JSON-RPC object' },
+      });
+    }
+
+    const msg = body as { method?: string; id?: unknown };
+    const method = typeof msg.method === 'string' ? msg.method : 'unknown';
+    logger.info({ method, id: msg.id }, 'MCP HTTP request');
+
+    try {
+      const result = await handleMcpHttpRequest(body, method === 'initialize');
+      return reply.send(result);
+    } catch (err) {
+      logger.error({ err, method }, 'MCP HTTP request failed');
+      return reply.code(500).send({
+        jsonrpc: '2.0',
+        id: (body as { id?: unknown }).id ?? null,
+        error: { code: -32603, message: `Internal error: ${(err as Error).message}` },
+      });
+    }
+  });
 
   // ─── Assess Token ───────────────────────────────────────────
   app.post<{ Body: { chain: string; address: string } }>('/v1/assess-token', async (req, reply) => {
@@ -173,6 +215,13 @@ export async function buildApp(): Promise<FastifyInstance> {
     },
     servers: [{ url: 'https://sentriagent.xyz', description: 'Production' }],
     paths: {
+      '/mcp': {
+        post: {
+          summary: 'MCP over HTTP (stateless) — OKX.AI A2MCP transport',
+          description: 'Accepts JSON-RPC 2.0 MCP messages: initialize, tools/list, tools/call. No payment required; the OKX.AI A2MCP marketplace wraps this with its own x402 layer.',
+          tags: ['mcp'],
+        },
+      },
       '/v1/assess-token': { post: { summary: 'Risk score for token', tags: ['risk'] } },
       '/v1/assess-wallet': { post: { summary: 'Risk profile for wallet', tags: ['risk'] } },
       '/v1/assess-tx': { post: { summary: 'Pre-flight tx simulation', tags: ['risk'] } },

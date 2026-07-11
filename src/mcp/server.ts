@@ -2,7 +2,9 @@
  * MCP Server — exposes SentriAgent risk tools to AI agents via Model Context Protocol.
  *
  * Compatible with: Claude Code, OpenClaw, Codex, Hermes
- * Transport: stdio (for local agents) and HTTP/SSE (for remote agents)
+ * Transports:
+ *   - stdio (for local agents via `sentriagent mcpStdio=true`)
+ *   - HTTP  (stateless Streamable HTTP, for OKX.AI marketplace + remote agents)
  *
  * Tools exposed:
  *   - assess_token    — Risk score for a token contract
@@ -17,7 +19,14 @@ import { z } from 'zod';
 import { logger } from '../utils/logger.js';
 import { assessToken, assessWallet, assessTx, bundleAssess } from '../risk/engine.js';
 
-export async function startMcpServer(): Promise<void> {
+/**
+ * Create a fresh McpServer instance and register all 4 tools.
+ *
+ * Each invocation returns a new McpServer because MCP servers are
+ * stateful per-connection (they own a Transport). The HTTP transport
+ * wraps this in a per-request stateless pattern.
+ */
+export function createMcpServer(): McpServer {
   const server = new McpServer({
     name: 'sentriagent',
     version: '0.1.0',
@@ -153,8 +162,69 @@ export async function startMcpServer(): Promise<void> {
     }
   );
 
-  // Start stdio transport
+  return server;
+}
+
+/**
+ * Start the MCP server in stdio transport mode (for local agents:
+ * Claude Code, OpenClaw, Codex, Hermes).
+ */
+export async function startMcpServer(): Promise<void> {
+  const server = createMcpServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
   logger.info('MCP server started on stdio transport');
+}
+
+/**
+ * Handle a single HTTP request as a stateless MCP-over-HTTP call.
+ *
+ * Per the OKX.AI marketplace requirement, each POST /mcp is independent:
+ * no session state is kept between requests. We build a fresh server
+ * + WebStandardStreamableHTTPServerTransport per request with
+ * `sessionIdGenerator: undefined` (stateless mode) and
+ * `enableJsonResponse: true` (so the marketplace reviewer gets plain
+ * JSON, not SSE).
+ *
+ * We use the Web Standard transport (not the Node wrapper) because
+ * Fastify gives us a parsed body, not a raw IncomingMessage stream.
+ */
+export async function handleMcpHttpRequest(
+  body: unknown,
+  _isInitialize: boolean,
+): Promise<unknown> {
+  const server = createMcpServer();
+
+  // Web Standard transport — accepts a Request, returns a Response.
+  const { WebStandardStreamableHTTPServerTransport } = await import(
+    '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js'
+  );
+
+  const transport = new WebStandardStreamableHTTPServerTransport({
+    sessionIdGenerator: undefined,  // stateless — no session tracking
+    enableJsonResponse: true,          // marketplace gets plain JSON
+  });
+
+  await server.connect(transport as unknown as Parameters<typeof server.connect>[0]);
+
+  // Build a Web Request from the parsed body. Use the public URL so
+  // any path-dependent code (e.g. behind a reverse proxy) sees the
+  // right origin; the body is what matters here.
+  const request = new Request('https://sentriagent.xyz/mcp', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      accept: 'application/json, text/event-stream',
+    },
+    body: JSON.stringify(body),
+  });
+
+  const response = await transport.handleRequest(request);
+  const text = await response.text();
+  // Try to parse as JSON, fall back to wrapping in {raw}
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { raw: text };
+  }
 }
