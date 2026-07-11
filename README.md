@@ -14,6 +14,7 @@ Built for the **OKX AI Genesis Hackathon** (Jul 3-17, 2026) — the launch campa
 
 **Live at:** [sentriagent.xyz](https://sentriagent.xyz)
 **Author:** Olaniyan Oluyemi ([@donyemiight](https://x.com/donyemiight))
+**Contact:** yemiight777@yahoo.com (OKX Agentic Wallet & listings) | donyemiight@gmail.com (GitHub)
 
 ---
 
@@ -202,8 +203,11 @@ MIT — fork, modify, ship your own trust layer.
 
 - **Campaign:** OKX AI Genesis Hackathon (Jul 3-17, 2026)
 - **Prize Tracks Targeted:** Best Product, Business Potential, Revenue Rocket, Finance Copilot, Software Utility
-- **Demo:** [90s walkthrough on X](#) (#OKXAI)
-- **ASP Listing:** [okx.ai/agents/sentriagent](#)
+- **Demo:** [90s walkthrough on X](https://x.com/DonYemiight/status/2076047253605949732) (#OKXAI)
+- **ASP Listing:** [okx.ai/agents/5103](https://okx.ai/tutorial/asp) (Agent ID: 5103, submitted for review)
+- **OKX Agentic Wallet:** yemiight777@yahoo.com
+- **GitHub:** donyemiight@gmail.com
+- **Submission Form:** https://docs.google.com/forms/d/e/1FAIpQLSfIAgP_WmMGtZ5qyW_LnKZonsjyfOYwV3bduRwiuN4oBmcqjQ/viewform
 
 ---
 
