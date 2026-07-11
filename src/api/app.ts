@@ -46,7 +46,7 @@ export async function buildApp(): Promise<FastifyInstance> {
     name: 'SentriAgent',
     description: 'The trust layer every AI agent calls before it touches money.',
     version: '0.1.0',
-    protocol: 'MCP over stdio + HTTP/SSE',
+    protocol: 'MCP over stdio (local agents) + Streamable HTTP (OKX.AI marketplace)',
     payment: {
       protocol: 'OKX Agent Payments Protocol (APP)',
       currency: config.paymentToken,
@@ -68,6 +68,7 @@ export async function buildApp(): Promise<FastifyInstance> {
     sources: ['OKX onchainos-mcp', 'GoPlus Security', 'De.Fi'],
     endpoints: {
       mcp: 'stdio (Claude Code, OpenClaw, Codex, Hermes)',
+      mcpHttp: 'POST https://sentriagent.xyz/mcp (stateless, JSON-RPC 2.0)',
       http: 'https://sentriagent.xyz/v1/*',
       docs: 'https://sentriagent.xyz/docs',
       landing: 'https://sentriagent.xyz/',
