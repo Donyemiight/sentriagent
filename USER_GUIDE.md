@@ -67,7 +67,30 @@ Claude will:
 
 ---
 
-## 🛒 Method 3: OKX.AI Marketplace (For OKX Users)
+## 🛒 Method 3: OKX.AI Marketplace (For AI Agent Builders)
+
+**Important:** The OKX.AI marketplace is **designed for AI agents, not humans**. When you tap "USE NOW" on a marketplace listing, OKX shows you text to paste into your AI agent (OpenClaw, Hermes, Claude Code, Codex).
+
+If you don't have an AI agent, **use Method 1 (direct website) instead**.
+
+### For AI Agent Builders
+
+1. Open `https://okx.com/agents` in browser
+2. Search "SentriAgent" or "5103"
+3. Tap on the listing
+4. Tap **"USE NOW"**
+5. A modal opens with text to copy. It says:
+   > "I'd like to use the service provided by Agent 5103: Service title: SentriAgent Risk Tools. Service type: A2MCP. Endpoint: https://sentriagent.xyz/mcp. Please use OKX Agent Payments Protocol to send a request to this endpoint"
+6. **Paste this into your AI agent** (OpenClaw, Claude Code, Codex, Hermes)
+7. Your agent will automatically:
+   - Call the MCP endpoint at `https://sentriagent.xyz/mcp`
+   - Pay 0.01 USDT via x402/APP protocol
+   - Receive the risk verdict
+   - Use it in its decision-making
+
+### What This Means
+
+The marketplace is **agent-to-agent commerce**. Your AI agent discovers SentriAgent, pays for the risk check, and uses the verdict — all without human intervention.
 
 ### Direct Links To OKX.AI Marketplace
 
@@ -95,10 +118,11 @@ Claude will:
 ### How To Use It (After Finding)
 
 1. Tap **"USE NOW"** on the listing (costs 0.01 USDT per call)
-2. Approve the payment in your OKX Agentic Wallet
-3. Enter the contract address you want to assess
-4. Receive the risk verdict in-app
-5. (Optional) Leave a review to help other users
+2. **Casual user?** Use `https://sentriagent.xyz` instead (no agent needed)
+3. **AI agent builder?** Copy the text from the modal and paste into your agent
+4. Approve the payment in your OKX Agentic Wallet
+5. Receive the risk verdict in-app
+6. (Optional) Leave a review to help other users
 
 ### First Time? Set Up An Agentic Wallet
 
