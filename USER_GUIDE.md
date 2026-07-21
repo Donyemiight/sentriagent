@@ -71,8 +71,9 @@ Claude will:
 
 ### Direct Links To OKX.AI Marketplace
 
-- **Main marketplace:** https://okx.ai
-- **Developer docs:** https://web3.okx.com/onchainos
+- **Main marketplace:** https://okx.com/agents
+- **Tasks marketplace:** https://okx.com/tasks
+- **Onchain OS (dev page):** https://web3.okx.com/onchainos
 - **Tutorial:** https://okx.ai/tutorial/asp
 - **Mobile (in app):** OKX app → Web3 → AI Marketplace
 
