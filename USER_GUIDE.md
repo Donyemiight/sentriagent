@@ -69,12 +69,30 @@ Claude will:
 
 ## 🛒 Method 3: OKX.AI Marketplace (For OKX Users)
 
+### Direct Links To OKX.AI Marketplace
+
+- **Web (desktop):** https://web3.okx.com/ai-marketplace
+- **Web (alt):** https://web3.okx.com/onchainos
+- **Mobile (in app):** OKX app → Web3 → AI Marketplace
+
 ### Find SentriAgent
 
-1. Open the OKX app
-2. Tap **"Marketplace"** (or "AI Agents")
-3. Search for **"SentriAgent"** or browse the category
-4. Tap the SentriAgent card
+1. Open the OKX app (or click the web link)
+2. Login required — you need an OKX account + Agentic Wallet
+3. Go to **"Web3"** → **"AI Marketplace"**
+4. Search for **"SentriAgent"** (Agent ID 5103) or browse the SOFTWARE_SERVICES category
+5. Tap the SentriAgent card
+
+### First Time? Set Up An Agentic Wallet
+
+1. Open OKX app → **Web3** section
+2. Tap **"Agentic Wallet"** (or "AI Wallet")
+3. Verify email with OTP code
+4. Set a password
+5. **Backup your seed phrase** (12 words — write these down!)
+6. Fund the wallet:
+   - Buy USDT on OKX Exchange → Transfer to Agentic Wallet on X Layer
+   - OR use the in-app bridge from another chain
 
 ### Use The Service
 
