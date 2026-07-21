@@ -73,7 +73,7 @@ Claude will:
 
 If you don't have an AI agent, **use Method 1 (direct website) instead**.
 
-### For AI Agent Builders
+### For AI Agent Builders (OpenClaw, Claude Code, Codex)
 
 1. Open `https://okx.com/agents` in browser
 2. Search "SentriAgent" or "5103"
@@ -81,12 +81,45 @@ If you don't have an AI agent, **use Method 1 (direct website) instead**.
 4. Tap **"USE NOW"**
 5. A modal opens with text to copy. It says:
    > "I'd like to use the service provided by Agent 5103: Service title: SentriAgent Risk Tools. Service type: A2MCP. Endpoint: https://sentriagent.xyz/mcp. Please use OKX Agent Payments Protocol to send a request to this endpoint"
-6. **Paste this into your AI agent** (OpenClaw, Claude Code, Codex, Hermes)
+6. **Paste this into your AI agent** (OpenClaw, Claude Code, Codex)
 7. Your agent will automatically:
    - Call the MCP endpoint at `https://sentriagent.xyz/mcp`
    - Pay 0.01 USDT via x402/APP protocol
    - Receive the risk verdict
    - Use it in its decision-making
+
+### Real Setup For OpenClaw (Phone-Friendly)
+
+```bash
+# In Termux on Android
+pkg install nodejs
+npm install -g @openclaw/cli
+
+# Install OKX trade kit
+npm install -g okx-trade-mcp okx-trade-cli
+
+# Get the OKX skill
+npx skills add okx/agent-skills
+
+# Add SentriAgent
+openclaw mcp add sentriagent --endpoint https://sentriagent.xyz/mcp
+
+# Use it
+openclaw "Check if USDT (0xdac17f958d2ee523a2206206994597c13d831ec7) is safe to trade on ethereum"
+```
+
+### Real Setup For Claude Code (Desktop/Cloud)
+
+```bash
+# Install Claude Code
+npm install -g @anthropic-ai/claude-code
+
+# Add SentriAgent MCP
+claude mcp add sentriagent --transport http --endpoint https://sentriagent.xyz/mcp
+
+# Use it
+claude "Is this token safe: 0xdac17f958d2ee523a2206206994597c13d831ec7?"
+```
 
 ### What This Means
 
