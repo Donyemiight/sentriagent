@@ -78,6 +78,8 @@ Agents pay via x402:
 
 ## 🚀 Quick Start
 
+### 📖 New user? Read the [USER_GUIDE.md](USER_GUIDE.md) for 3 ways to use SentriAgent (website, MCP, marketplace).
+
 ### Install MCP server (for Claude Code / OpenClaw / Codex)
 
 ```bash
