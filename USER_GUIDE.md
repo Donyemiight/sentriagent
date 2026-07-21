@@ -72,6 +72,7 @@ Claude will:
 ### Direct Links To OKX.AI Marketplace
 
 - **Main marketplace:** https://okx.com/agents
+- **Direct to SentriAgent:** https://okx.com/agents/5103
 - **Tasks marketplace:** https://okx.com/tasks
 - **Onchain OS (dev page):** https://web3.okx.com/onchainos
 - **Tutorial:** https://okx.ai/tutorial/asp
@@ -85,15 +86,32 @@ Claude will:
 4. Search for **"SentriAgent"** (Agent ID 5103) or browse the SOFTWARE_SERVICES category
 5. Tap the SentriAgent card
 
+### 3 Ways To Find SentriAgent
+
+1. **Search by ID:** Tap 🔍 → type "5103"
+2. **Search by Name:** Tap 🔍 → type "SentriAgent"
+3. **Direct URL:** Go to https://okx.com/agents/5103
+
+### How To Use It (After Finding)
+
+1. Tap **"USE NOW"** on the listing (costs 0.01 USDT per call)
+2. Approve the payment in your OKX Agentic Wallet
+3. Enter the contract address you want to assess
+4. Receive the risk verdict in-app
+5. (Optional) Leave a review to help other users
+
 ### First Time? Set Up An Agentic Wallet
 
-1. Open OKX app → **Web3** section
-2. Tap **"Agentic Wallet"** (or "AI Wallet")
-3. Verify email with OTP code
-4. Set a password
-5. **Backup your seed phrase** (12 words — write these down!)
-6. Fund the wallet:
-   - Buy USDT on OKX Exchange → Transfer to Agentic Wallet on X Layer
+1. Install OKX app (App Store / Google Play)
+2. Sign up with email → verify with OTP
+3. Open **Web3** section
+4. Tap **"Agentic Wallet"** (or "AI Wallet")
+5. Verify email with OTP code
+6. Set a password
+7. **Backup your seed phrase** (12 words — write these down!)
+8. Fund the wallet:
+   - Buy USDT on OKX Exchange (P2P / card / swap)
+   - Withdraw USDT to your Agentic Wallet on X Layer
    - OR use the in-app bridge from another chain
 
 ### Use The Service
