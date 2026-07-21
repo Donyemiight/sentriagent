@@ -111,6 +111,43 @@ export async function buildApp(): Promise<FastifyInstance> {
     }
   });
 
+  // ─── Free Demo (for marketplace cold-start / try-before-buy) ──
+  // Returns real risk score for a limited set of well-known tokens
+  // (USDT, USDC, WETH, WBTC) without payment. Designed to:
+  //   1. Lower friction for first-time users
+  //   2. Drive review submissions after a successful test
+  //   3. Counter the cold-start problem on a new marketplace listing
+  app.post<{ Body: { chain: string; address: string } }>('/v1/demo', async (req, reply) => {
+    const { chain, address } = req.body;
+    if (!chain || !address) {
+      return reply.code(400).send({ error: 'Missing chain or address' });
+    }
+
+    // Allow only well-known tokens for free demo (rate-limited)
+    const demoTokens = [
+      { chain: 'ethereum', address: '0xdac17f958d2ee523a2206206994597c13d831ec7', symbol: 'USDT' },
+      { chain: 'ethereum', address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', symbol: 'USDC' },
+      { chain: 'ethereum', address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', symbol: 'WETH' },
+      { chain: 'ethereum', address: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', symbol: 'WBTC' },
+      { chain: 'bsc', address: '0x55d398326f99059ff775485246999027b3197955', symbol: 'USDT' },
+      { chain: 'polygon', address: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f', symbol: 'USDT' },
+    ];
+
+    const match = demoTokens.find(t =>
+      t.chain === chain && t.address.toLowerCase() === address.toLowerCase()
+    );
+
+    if (!match) {
+      return reply.code(403).send({
+        error: 'Demo limited to whitelisted tokens. Use /v1/assess-token for full access (0.01 USDT).',
+        allowedTokens: demoTokens.map(t => ({ chain: t.chain, address: t.address, symbol: t.symbol })),
+      });
+    }
+
+    const verdict = await assessToken({ chain: chain as any, address });
+    return { ...verdict, _demo: true, _note: 'Free demo call. Use /v1/assess-token for arbitrary tokens.' };
+  });
+
   // ─── Assess Token ───────────────────────────────────────────
   app.post<{ Body: { chain: string; address: string } }>('/v1/assess-token', async (req, reply) => {
     const ok = await requirePayment(req, reply, config.pricePerCall);
