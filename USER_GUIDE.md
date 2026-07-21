@@ -71,8 +71,9 @@ Claude will:
 
 ### Direct Links To OKX.AI Marketplace
 
-- **Web (desktop):** https://web3.okx.com/ai-marketplace
-- **Web (alt):** https://web3.okx.com/onchainos
+- **Main marketplace:** https://okx.ai
+- **Developer docs:** https://web3.okx.com/onchainos
+- **Tutorial:** https://okx.ai/tutorial/asp
 - **Mobile (in app):** OKX app → Web3 → AI Marketplace
 
 ### Find SentriAgent
