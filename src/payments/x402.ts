@@ -63,6 +63,31 @@ export function sendPaymentChallenge(
 
   logger.info({ paymentId, price: challenge.price, currency: challenge.currency }, 'Sending 402 challenge');
 
+  // Build parallel OKX x402 v2 standard challenge so marketplace CLI
+  // (task-402-pay) can recognize and pay this endpoint.
+  const USDT0_XLAYER = '0x779ded0c9e1022225f8e0630b35a9b54be713736';
+  const amountMinUnits = (priceUsd * 1_000_000).toString();
+  const okxV2 = {
+    x402Version: 2,
+    resource: {
+      url: req.url,
+      description: 'SentriAgent risk assessment — pay per call via x402 on X Layer',
+      mimeType: 'application/json',
+    },
+    accepts: [
+      {
+        scheme: 'exact' as const,
+        network: 'eip155:196',
+        amount: amountMinUnits,
+        asset: USDT0_XLAYER,
+        payTo: config.paymentReceiverAddress,
+        maxTimeoutSeconds: 300,
+        extra: { name: 'USD₮0', version: '1' },
+      },
+    ],
+  };
+  const okxHeaderB64 = Buffer.from(JSON.stringify(okxV2)).toString('base64');
+
   return reply
     .code(402)
     .header('WWW-Authenticate', `Payment realm="sentriagent", charset="UTF-8"`)
@@ -70,12 +95,18 @@ export function sendPaymentChallenge(
     .header('X-Payment-Protocol', 'okx-app/1.0')
     .header('X-Payment-Version', '1.0')
     .header('X-Payment-Endpoint', 'https://sentriagent.xyz/v1/payment/verify')
+    .header('PAYMENT-REQUIRED', okxHeaderB64)            // OKX x402 v2 standard
+    .header('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED, PAYMENT-SIGNATURE, WWW-Authenticate')
     .send({
       error: 'payment_required',
       message: 'SentriAgent requires x402 payment. Pay the challenge amount to receive the risk verdict.',
       challenge,
       accepted_schemes: ['exact', 'session'],
       docs: 'https://sentriagent.xyz/docs/payment',
+      // Also embed the OKX v2 standard challenge in the body so
+      // any caller (including the OKX marketplace CLI) can parse it
+      // without depending on the PAYMENT-REQUIRED header.
+      x402: okxV2,
     });
 }
 
@@ -119,12 +150,26 @@ export async function requirePayment(
   reply: FastifyReply,
   priceUsd: number
 ): Promise<boolean> {
+  // OKX x402 v2 path: check PAYMENT-SIGNATURE first (marketplace standard)
+  const okxSig = (req.headers['payment-signature'] || req.headers['x-payment']) as string | undefined;
+  if (okxSig) {
+    const { verifyOkxV2Receipt } = await import('./okx-x402.js');
+    const amount = (priceUsd * 1_000_000).toString();
+    const v = verifyOkxV2Receipt(okxSig, {
+      amount,
+      payTo: config.paymentReceiverAddress,
+      network: 'eip155:196',
+    });
+    if (v.ok) return true;
+    reply.code(402).send({ error: 'payment_invalid', reason: v.reason });
+    return false;
+  }
+
+  // Custom okx-app/1.0 path: keep for backward compat with existing integrations
   const paymentId = req.headers['x-payment-id'] as string | undefined;
   const proof = req.headers['x-payment'] as string | undefined;
   const txHash = req.headers['x-payment-tx'] as string | undefined;
 
-  // Free tier: allow 3 calls per IP per hour (rate-limited separately)
-  // For paid calls: require valid payment
   if (!paymentId || !proof) {
     sendPaymentChallenge(req, reply, priceUsd);
     return false;

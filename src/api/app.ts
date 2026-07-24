@@ -23,6 +23,7 @@ import { config } from '../utils/config.js';
 import { logger } from '../utils/logger.js';
 import { assessToken, assessWallet, assessTx, bundleAssess } from '../risk/engine.js';
 import { requirePayment } from '../payments/x402.js';
+import { requireOkxV2Payment, sendOkxV2Challenge } from '../payments/okx-x402.js';
 import { handleMcpHttpRequest } from '../mcp/server.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
@@ -81,9 +82,11 @@ export async function buildApp(): Promise<FastifyInstance> {
   //   tools/list  → enumerate our 4 tools
   //   tools/call  → invoke a tool (returns same JSON verdict as stdio)
   //
-  // Payment is NOT enforced here. The OKX.AI A2MCP marketplace
-  // wraps this endpoint in its own x402 layer; the standalone reviewer
-  // (initialize / tools/list) needs free access to verify the listing.
+  // REVISION (2026-07-24): Now enforces OKX x402 v2 paywall on tools/call
+  // (pricePerCall = $0.01 USDT). The marketplace CLI's task-402-pay signs
+  // against the standard envelope, so we MUST return 402 in the standard
+  // x402 format for marketplace calls to register as sales.
+  // initialize + tools/list remain free for protocol discovery.
   app.post('/mcp', async (req, reply) => {
     const body = req.body as unknown;
     if (!body || typeof body !== 'object') {
@@ -97,6 +100,12 @@ export async function buildApp(): Promise<FastifyInstance> {
     const msg = body as { method?: string; id?: unknown };
     const method = typeof msg.method === 'string' ? msg.method : 'unknown';
     logger.info({ method, id: msg.id }, 'MCP HTTP request');
+
+    // Enforce OKX x402 v2 paywall on actual tool calls (not initialize/tools/list)
+    if (method === 'tools/call') {
+      const paid = requireOkxV2Payment(req, reply, config.pricePerCall);
+      if (!paid) return; // 402 already sent
+    }
 
     try {
       const result = await handleMcpHttpRequest(body, method === 'initialize');
@@ -256,7 +265,7 @@ export async function buildApp(): Promise<FastifyInstance> {
       '/mcp': {
         post: {
           summary: 'MCP over HTTP (stateless) — OKX.AI A2MCP transport',
-          description: 'Accepts JSON-RPC 2.0 MCP messages: initialize, tools/list, tools/call. No payment required; the OKX.AI A2MCP marketplace wraps this with its own x402 layer.',
+          description: 'Accepts JSON-RPC 2.0 MCP messages: initialize, tools/list, tools/call. tools/call requires OKX x402 v2 payment ($0.01 USDT/call). initialize + tools/list are free.',
           tags: ['mcp'],
         },
       },

@@ -22,6 +22,7 @@ import { config } from '../utils/config.js';
 import { logger } from '../utils/logger.js';
 import { assessToken, assessWallet, assessTx, bundleAssess } from '../risk/engine.js';
 import { requirePayment } from '../payments/x402.js';
+import { requireOkxV2Payment } from '../payments/okx-x402.js';
 import { handleMcpHttpRequest } from '../mcp/server.js';
 export async function buildApp() {
     const app = Fastify({
@@ -76,9 +77,11 @@ export async function buildApp() {
     //   tools/list  → enumerate our 4 tools
     //   tools/call  → invoke a tool (returns same JSON verdict as stdio)
     //
-    // Payment is NOT enforced here. The OKX.AI A2MCP marketplace
-    // wraps this endpoint in its own x402 layer; the standalone reviewer
-    // (initialize / tools/list) needs free access to verify the listing.
+    // REVISION (2026-07-24): Now enforces OKX x402 v2 paywall on tools/call
+    // (pricePerCall = $0.01 USDT). The marketplace CLI's task-402-pay signs
+    // against the standard envelope, so we MUST return 402 in the standard
+    // x402 format for marketplace calls to register as sales.
+    // initialize + tools/list remain free for protocol discovery.
     app.post('/mcp', async (req, reply) => {
         const body = req.body;
         if (!body || typeof body !== 'object') {
@@ -91,6 +94,12 @@ export async function buildApp() {
         const msg = body;
         const method = typeof msg.method === 'string' ? msg.method : 'unknown';
         logger.info({ method, id: msg.id }, 'MCP HTTP request');
+        // Enforce OKX x402 v2 paywall on actual tool calls (not initialize/tools/list)
+        if (method === 'tools/call') {
+            const paid = requireOkxV2Payment(req, reply, config.pricePerCall);
+            if (!paid)
+                return; // 402 already sent
+        }
         try {
             const result = await handleMcpHttpRequest(body, method === 'initialize');
             return reply.send(result);
@@ -103,6 +112,36 @@ export async function buildApp() {
                 error: { code: -32603, message: `Internal error: ${err.message}` },
             });
         }
+    });
+    // ─── Free Demo (for marketplace cold-start / try-before-buy) ──
+    // Returns real risk score for a limited set of well-known tokens
+    // (USDT, USDC, WETH, WBTC) without payment. Designed to:
+    //   1. Lower friction for first-time users
+    //   2. Drive review submissions after a successful test
+    //   3. Counter the cold-start problem on a new marketplace listing
+    app.post('/v1/demo', async (req, reply) => {
+        const { chain, address } = req.body;
+        if (!chain || !address) {
+            return reply.code(400).send({ error: 'Missing chain or address' });
+        }
+        // Allow only well-known tokens for free demo (rate-limited)
+        const demoTokens = [
+            { chain: 'ethereum', address: '0xdac17f958d2ee523a2206206994597c13d831ec7', symbol: 'USDT' },
+            { chain: 'ethereum', address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', symbol: 'USDC' },
+            { chain: 'ethereum', address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', symbol: 'WETH' },
+            { chain: 'ethereum', address: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', symbol: 'WBTC' },
+            { chain: 'bsc', address: '0x55d398326f99059ff775485246999027b3197955', symbol: 'USDT' },
+            { chain: 'polygon', address: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f', symbol: 'USDT' },
+        ];
+        const match = demoTokens.find(t => t.chain === chain && t.address.toLowerCase() === address.toLowerCase());
+        if (!match) {
+            return reply.code(403).send({
+                error: 'Demo limited to whitelisted tokens. Use /v1/assess-token for full access (0.01 USDT).',
+                allowedTokens: demoTokens.map(t => ({ chain: t.chain, address: t.address, symbol: t.symbol })),
+            });
+        }
+        const verdict = await assessToken({ chain: chain, address });
+        return { ...verdict, _demo: true, _note: 'Free demo call. Use /v1/assess-token for arbitrary tokens.' };
     });
     // ─── Assess Token ───────────────────────────────────────────
     app.post('/v1/assess-token', async (req, reply) => {
@@ -190,7 +229,7 @@ export async function buildApp() {
             '/mcp': {
                 post: {
                     summary: 'MCP over HTTP (stateless) — OKX.AI A2MCP transport',
-                    description: 'Accepts JSON-RPC 2.0 MCP messages: initialize, tools/list, tools/call. No payment required; the OKX.AI A2MCP marketplace wraps this with its own x402 layer.',
+                    description: 'Accepts JSON-RPC 2.0 MCP messages: initialize, tools/list, tools/call. tools/call requires OKX x402 v2 payment ($0.01 USDT/call). initialize + tools/list are free.',
                     tags: ['mcp'],
                 },
             },
