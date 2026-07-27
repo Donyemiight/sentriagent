@@ -71,6 +71,112 @@ export async function buildApp() {
             landing: 'https://sentriagent.xyz/',
         },
     }));
+    // ─── x402 Discovery Manifest ─────────────────────
+    // Standard x402 discovery endpoint: https://github.com/coinbase/x402
+    // Lets crawlers and agents auto-discover our paid endpoints.
+    app.get('/.well-known/x402', async () => ({
+        x402Version: 2,
+        name: 'SentriAgent',
+        description: 'The trust layer every AI agent calls before it touches money. Multi-source risk scoring for tokens, wallets, and transactions.',
+        homepage: 'https://sentriagent.xyz',
+        agentId: '5103',
+        network: 'eip155:196',
+        chain: 'X Layer',
+        asset: 'USDT0',
+        assetAddress: '0x779ded0c9e1022225f8e0630b35a9b54be713736',
+        assetDecimals: 6,
+        receiveAddress: config.paymentReceiverAddress,
+        facilitator: 'https://x402.okx.com',
+        services: [
+            {
+                id: 'assess_token',
+                name: 'Token Risk Score',
+                description: 'Get a 0-100 risk score for any token contract. Fuses OKX onchainos-mcp, GoPlus Security, and De.Fi signals. Returns verdict + recommendation in under 2 seconds.',
+                priceUSDT: config.pricePerCall.toString(),
+                endpoint: 'https://sentriagent.xyz/v1/assess-token',
+                method: 'POST',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        chain: { type: 'string', enum: ['ethereum', 'bsc', 'polygon', 'arbitrum', 'base', 'xlayer', 'solana'] },
+                        address: { type: 'string' },
+                    },
+                    required: ['chain', 'address'],
+                },
+                free: false,
+            },
+            {
+                id: 'assess_wallet',
+                name: 'Wallet Risk Profile',
+                description: 'Get a 0-100 risk profile for a wallet address. Checks rug history, sanctions, and mixer exposure.',
+                priceUSDT: config.pricePerCall.toString(),
+                endpoint: 'https://sentriagent.xyz/v1/assess-wallet',
+                method: 'POST',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        chain: { type: 'string', enum: ['ethereum', 'bsc', 'polygon', 'arbitrum', 'base', 'xlayer', 'solana'] },
+                        address: { type: 'string' },
+                    },
+                    required: ['chain', 'address'],
+                },
+                free: false,
+            },
+            {
+                id: 'assess_tx',
+                name: 'Transaction Pre-flight',
+                description: 'Pre-flight simulation combining target token risk + sender wallet risk before a transaction is broadcast.',
+                priceUSDT: '0.02',
+                endpoint: 'https://sentriagent.xyz/v1/assess-tx',
+                method: 'POST',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        chain: { type: 'string' },
+                        from: { type: 'string' },
+                        to: { type: 'string' },
+                        data: { type: 'string' },
+                        value: { type: 'string' },
+                    },
+                    required: ['chain', 'from', 'to'],
+                },
+                free: false,
+            },
+            {
+                id: 'bundle_assess',
+                name: 'Bulk Token Risk (5 tokens)',
+                description: 'Assess 5 tokens in a single call. 20% cheaper than calling assess_token 5 times.',
+                priceUSDT: config.pricePerBundle.toString(),
+                endpoint: 'https://sentriagent.xyz/v1/bundle-assess',
+                method: 'POST',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        tokens: { type: 'array', items: { type: 'object' }, minItems: 1, maxItems: 5 },
+                    },
+                    required: ['tokens'],
+                },
+                free: false,
+            },
+            {
+                id: 'demo',
+                name: 'Free Demo (whitelisted tokens only)',
+                description: 'Free risk score for whitelisted tokens (USDT, USDC, WETH, WBTC on Ethereum/BSC/Polygon). Rate-limited per IP. Try before you buy.',
+                priceUSDT: '0',
+                endpoint: 'https://sentriagent.xyz/v1/demo',
+                method: 'POST',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        chain: { type: 'string' },
+                        address: { type: 'string' },
+                    },
+                    required: ['chain', 'address'],
+                },
+                free: true,
+            },
+        ],
+    }));
     // ─── MCP over HTTP (stateless) — for OKX.AI marketplace ──
     // Accepts standard JSON-RPC 2.0 MCP messages:
     //   initialize  → protocol handshake
