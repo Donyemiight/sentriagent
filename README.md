@@ -214,3 +214,4 @@ MIT — fork, modify, ship your own trust layer.
 ---
 
 Built with ❤️ by [@donyemiight](https://x.com/donyemiight) for the agent economy.
+<!-- Last deploy trigger: Thu Jul 30 16:33:03 UTC 2026 -->
